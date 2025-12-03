@@ -86,7 +86,7 @@ npx eslint-config-install --type next --template eslintrc
 
 ---
 
-## 생성·병합되는 파일
+## 설정 파일 구성
 
 ### 1. ESLint
 
@@ -104,7 +104,7 @@ npx eslint-config-install --type next --template eslintrc
 - **`--template eslintrc`**
   - `.prettierrc`
 
-### 3. `package.json` (devDependencies 병합)
+### 3. package.json
 
 선택한 템플릿 디렉터리의 `package.json`에서 **`devDependencies`만** 읽어서 현재 프로젝트의 `package.json`에 병합합니다.
 
