@@ -1,0 +1,24 @@
+{
+  "name": "eslint-config-install",
+  "version": "0.1.0",
+  "description": "CLI 도구: React/Next/기본용 ESLint + Prettier 설정을 ESM/CJS 템플릿으로 복사해주는 설치 헬퍼",
+  "bin": {
+    "eslint-config-install": "bin/index.mjs"
+  },
+  "type": "module",
+  "scripts": {
+    "lint": "echo \"no-op\""
+  },
+  "keywords": [
+    "eslint",
+    "prettier",
+    "config",
+    "react",
+    "nextjs",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT"
+}
+
+
