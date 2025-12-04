@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// eslint-config-install: ESLint / Prettier 템플릿을 현재 프로젝트에 적용하는 CLI입니다.
+// eslint-config-template: ESLint / Prettier 템플릿을 현재 프로젝트에 적용하는 CLI입니다.
 import fs from "fs";
 import path from "path";
 import readline from "readline";
@@ -13,10 +13,10 @@ const require = createRequire(import.meta.url);
 
 function printHelp() {
   console.log(`
-eslint-config-install
+eslint-config-template
 
 사용법:
-  npx eslint-config-install --type [react|next] --template [flat-config|eslintrc] [--on-exists skip|keep|overwrite]
+  npx eslint-config-template --type [react|next] --template [flat-config|eslintrc] [--on-exists skip|keep|overwrite]
 
 옵션:
   --type      설정 종류 (react, next)
@@ -25,9 +25,9 @@ eslint-config-install
               (skip = 건너뛰기, keep = 기존 유지 및 새파일 생성, overwrite = 덮어쓰기, 기본값: overwrite)
 
 예시:
-  npx eslint-config-install --type react --template flat-config
-  npx eslint-config-install --type next --template flat-config
-  npx eslint-config-install --type next --template eslintrc
+  npx eslint-config-template --type react --template flat-config
+  npx eslint-config-template --type next --template flat-config
+  npx eslint-config-template --type next --template eslintrc
 `.trim());
 }
 
