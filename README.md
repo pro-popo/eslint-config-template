@@ -1,4 +1,4 @@
-## eslint-config-template
+## lint-setup-cli
 
 React / Next.js + TypeScript 환경에서 **ESLint / Prettier / VS Code 설정을 한 번에 세팅해 주는 CLI**입니다.  
 템플릿 파일을 복사·병합해서, 바로 사용할 수 있는 설정을 만들어 줍니다.
@@ -20,16 +20,16 @@ React / Next.js + TypeScript 환경에서 **ESLint / Prettier / VS Code 설정�
 패키지 설치:
 
 ```bash
-npm install -D eslint-config-template
+npm install -D lint-setup-cli
 # 또는
-yarn add -D eslint-config-template
-pnpm add -D eslint-config-template
+yarn add -D lint-setup-cli
+pnpm add -D lint-setup-cli
 ```
 
 `npx`로 한 번만 실행해도 됩니다:
 
 ```bash
-npx eslint-config-template --type next --template flat-config
+npx lint-setup-cli --type next --template flat-config
 ```
 
 ---
@@ -39,7 +39,7 @@ npx eslint-config-template --type next --template flat-config
 ### 기본 명령
 
 ```bash
-npx eslint-config-template \
+npx lint-setup-cli \
   --type [react|next] \
   --template [flat-config|eslintrc] \
   [--on-exists skip|keep|overwrite]
@@ -75,13 +75,13 @@ npx eslint-config-template \
 
 ```bash
 # 1) Flat Config 기반 Next.js
-npx eslint-config-template --type next --template flat-config
+npx lint-setup-cli --type next --template flat-config
 
 # 2) Flat Config 기반 React
-npx eslint-config-template --type react --template flat-config
+npx lint-setup-cli --type react --template flat-config
 
 # 3) eslintrc(.eslintrc.json) 기반 Next.js
-npx eslint-config-template --type next --template eslintrc
+npx lint-setup-cli --type next --template eslintrc
 ```
 
 ---
@@ -130,12 +130,12 @@ npx eslint-config-template --type next --template eslintrc
 ## 로컬 개발 / 테스트
 
 - **`npm link`를 이용한 전역 설치 시뮬레이션**
-  - 1단계: 패키지 저장소 경로 (eslint-config-template repo):
+  - 1단계: 패키지 저장소 경로 (lint-setup-cli repo):
     ```bash
     npm link
     ```
   - 2단계: 테스트용 프로젝트 경로:
     ```bash
-    npm link eslint-config-template
-    npx eslint-config-template --type next --template flat-config
+    npm link lint-setup-cli
+    npx lint-setup-cli --type next --template flat-config
     ```

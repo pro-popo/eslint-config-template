@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// eslint-config-template: ESLint / Prettier 템플릿을 현재 프로젝트에 적용하는 CLI입니다.
+// lint-setup-cli: ESLint / Prettier 템플릿을 현재 프로젝트에 적용하는 CLI입니다.
 import fs from "fs";
 import path from "path";
 import readline from "readline";
@@ -13,10 +13,10 @@ const require = createRequire(import.meta.url);
 
 function printHelp() {
   console.log(`
-eslint-config-template
+lint-setup-cli
 
 사용법:
-  npx eslint-config-template --type [react|next] --template [flat-config|eslintrc] [--on-exists skip|keep|overwrite]
+  npx lint-setup-cli --type [react|next] --template [flat-config|eslintrc] [--on-exists skip|keep|overwrite]
 
 옵션:
   --type      설정 종류 (react, next)
@@ -25,9 +25,9 @@ eslint-config-template
               (skip = 건너뛰기, keep = 기존 유지 및 새파일 생성, overwrite = 덮어쓰기, 기본값: overwrite)
 
 예시:
-  npx eslint-config-template --type react --template flat-config
-  npx eslint-config-template --type next --template flat-config
-  npx eslint-config-template --type next --template eslintrc
+  npx lint-setup-cli --type react --template flat-config
+  npx lint-setup-cli --type next --template flat-config
+  npx lint-setup-cli --type next --template eslintrc
 `.trim());
 }
 
@@ -70,7 +70,7 @@ async function copyTemplate({ type, template, onExists }) {
     !validTemplates.includes(normalizedTemplate) ||
     !validOnExists.includes(normalizedOnExists)
   ) {
-    console.error("[eslint-config] 잘못된 옵션입니다.\n");
+    console.error("[lint-setup-cli] 잘못된 옵션입니다.\n");
     printHelp();
     process.exit(1);
   }
@@ -80,7 +80,7 @@ async function copyTemplate({ type, template, onExists }) {
 
   if (!fs.existsSync(templateDir)) {
     console.error(
-      `[eslint-config] 템플릿을 찾을 수 없습니다: ${templateDir}`
+      `[lint-setup-cli] 템플릿을 찾을 수 없습니다: ${templateDir}`
     );
     process.exit(1);
   }
@@ -105,7 +105,7 @@ async function copyTemplate({ type, template, onExists }) {
     if (fs.existsSync(dest)) {
       if (normalizedOnExists === "overwrite") {
         fs.copyFileSync(src, dest);
-        console.log(`[eslint-config] 기존 설정 파일을 교체합니다: ${file}`);
+        console.log(`[lint-setup-cli] 기존 설정 파일을 교체합니다: ${file}`);
       } else if (normalizedOnExists === "keep") {
         const baseDir = fs.existsSync(path.join(process.cwd(), "src"))
           ? path.join(process.cwd(), "src")
@@ -115,18 +115,18 @@ async function copyTemplate({ type, template, onExists }) {
         fs.mkdirSync(path.dirname(configPath), { recursive: true });
         fs.copyFileSync(src, configPath);
         console.log(
-          `[eslint-config] 설정 파일을 생성합니다: config/${file}`
+          `[lint-setup-cli] 설정 파일을 생성합니다: config/${file}`
         );
       } else {
         console.log(
-          `[eslint-config] 이미 존재하는 설정 파일로 생성을 건너뜁니다: ${file}`
+          `[lint-setup-cli] 이미 존재하는 설정 파일로 생성을 건너뜁니다: ${file}`
         );
       }
       continue;
     }
 
     fs.copyFileSync(src, dest);
-    console.log(`[eslint-config] 설정 파일을 생성합니다: ${file}`);
+    console.log(`[lint-setup-cli] 설정 파일을 생성합니다: ${file}`);
   }
 
   // 실행 순서: ESLint -> Prettier -> package.json -> VS Code
@@ -169,7 +169,7 @@ function mergePackageJson(templateDir) {
       userPkg = JSON.parse(raw);
     } catch (error) {
       console.error(
-        "[eslint-config] package.json을 읽는 중 오류가 발생했습니다."
+        "[lint-setup-cli] package.json을 읽는 중 오류가 발생했습니다."
       );
       return;
     }
@@ -181,7 +181,7 @@ function mergePackageJson(templateDir) {
     templatePkg = JSON.parse(rawTemplate);
   } catch (error) {
     console.error(
-      "[eslint-config] package.json을 읽는 중 오류가 발생했습니다."
+      "[lint-setup-cli] package.json을 읽는 중 오류가 발생했습니다."
     );
     return;
   }
@@ -211,12 +211,12 @@ function mergePackageJson(templateDir) {
   try {
     fs.writeFileSync(userPkgPath, JSON.stringify(userPkg, null, 2) + "\n", "utf8");
     console.log(
-      "[eslint-config] 설정 파일을 병합합니다: package.json"
+      "[lint-setup-cli] 설정 파일을 병합합니다: package.json"
     );
 
     if (conflicts.length > 0) {
       console.log(
-        "[eslint-config] 버전이 다른 패키지가 있어 현재 버전을 유지했습니다 (참고용):"
+        "[lint-setup-cli] 버전이 다른 패키지가 있어 현재 버전을 유지했습니다 (참고용):"
       );
       for (const conflict of conflicts) {
         console.log(
@@ -226,7 +226,7 @@ function mergePackageJson(templateDir) {
     }
   } catch (error) {
     console.error(
-      "[eslint-config] package.json을 기록하는 중 오류가 발생했습니다."
+      "[lint-setup-cli] package.json을 기록하는 중 오류가 발생했습니다."
     );
   }
 }
@@ -238,7 +238,7 @@ function ensureVscodeSettings() {
 
     if (!fs.existsSync(vscodeDir)) {
       fs.mkdirSync(vscodeDir, { recursive: true });
-      console.log("[eslint-config] .vscode 디렉터리가 생성되었습니다.");
+      console.log("[lint-setup-cli] .vscode 디렉터리가 생성되었습니다.");
     }
 
     let currentSettings = {};
@@ -251,7 +251,7 @@ function ensureVscodeSettings() {
         }
       } catch (error) {
         console.warn(
-          "[eslint-config] 기존 .vscode/settings.json을 파싱할 수 없어 새로 작성합니다."
+          "[lint-setup-cli] 기존 .vscode/settings.json을 파싱할 수 없어 새로 작성합니다."
         );
         currentSettings = {};
       }
@@ -288,11 +288,11 @@ function ensureVscodeSettings() {
 
     fs.writeFileSync(settingsPath, JSON.stringify(mergedSettings, null, 2) + "\n", "utf8");
     console.log(
-      "[eslint-config] 설정 파일을 병합합니다: .vscode/settings.json"
+      "[lint-setup-cli] 설정 파일을 병합합니다: .vscode/settings.json"
     );
   } catch (error) {
     console.error(
-      "[eslint-config] .vscode/settings.json을 설정하는 중 오류가 발생했습니다.",
+      "[lint-setup-cli] .vscode/settings.json을 설정하는 중 오류가 발생했습니다.",
       error
     );
   }
@@ -305,7 +305,7 @@ function ensureVscodeExtensions() {
 
     if (!fs.existsSync(vscodeDir)) {
       fs.mkdirSync(vscodeDir, { recursive: true });
-      console.log("[eslint-config] .vscode 디렉터리가 생성되었습니다.");
+      console.log("[lint-setup-cli] .vscode 디렉터리가 생성되었습니다.");
     }
 
     let currentExtensions = {};
@@ -318,7 +318,7 @@ function ensureVscodeExtensions() {
         }
       } catch (error) {
         console.warn(
-          "[eslint-config] 기존 .vscode/extensions.json을 파싱할 수 없어 새로 작성합니다."
+          "[lint-setup-cli] 기존 .vscode/extensions.json을 파싱할 수 없어 새로 작성합니다."
         );
         currentExtensions = {};
       }
@@ -364,11 +364,11 @@ function ensureVscodeExtensions() {
 
     fs.writeFileSync(extensionsPath, JSON.stringify(merged, null, 2) + "\n", "utf8");
     console.log(
-      "[eslint-config] 설정 파일을 병합합니다: .vscode/extensions.json"
+      "[lint-setup-cli] 설정 파일을 병합합니다: .vscode/extensions.json"
     );
   } catch (error) {
     console.error(
-      "[eslint-config] .vscode/extensions.json을 설정하는 중 오류가 발생했습니다.",
+      "[lint-setup-cli] .vscode/extensions.json을 설정하는 중 오류가 발생했습니다.",
       error
     );
   }
@@ -395,7 +395,7 @@ function buildPrettierConfig(templateStyleDir, type, onExists) {
 
     if (!fs.existsSync(typePath)) {
       console.warn(
-        "[eslint-config] prettier 타입 템플릿을 찾을 수 없어 prettier.config.cjs 생성을 건너뜁니다."
+        "[lint-setup-cli] prettier 타입 템플릿을 찾을 수 없어 prettier.config.cjs 생성을 건너뜁니다."
       );
       return;
     }
@@ -426,11 +426,11 @@ function buildPrettierConfig(templateStyleDir, type, onExists) {
 
     fs.writeFileSync(targetPath, fileContent, "utf8");
     console.log(
-      `[eslint-config] 설정 파일을 생성합니다: ${path.relative(process.cwd(), targetPath)}`
+      `[lint-setup-cli] 설정 파일을 생성합니다: ${path.relative(process.cwd(), targetPath)}`
     );
   } catch (error) {
     console.error(
-      "[eslint-config] prettier.config.cjs를 생성하는 중 오류가 발생했습니다.",
+      "[lint-setup-cli] prettier.config.cjs를 생성하는 중 오류가 발생했습니다.",
       error
     );
   }
@@ -443,7 +443,7 @@ async function buildEslintConfig(templateStyleDir, type, onExists) {
     return;
   } catch (error) {
     console.error(
-      "[eslint-config] ESLint 설정 파일을 생성하는 중 오류가 발생했습니다.",
+      "[lint-setup-cli] ESLint 설정 파일을 생성하는 중 오류가 발생했습니다.",
       error
     );
   }
@@ -468,7 +468,7 @@ async function askOnExistsIfNeeded(onExistsArg) {
     });
 
     const message =
-      "\n[eslint-config] 이미 존재하는 설정 파일(.eslintrc, eslint.config, prettier 등)이 있을 때의 동작을 선택하세요.\n" +
+      "\n[lint-setup-cli] 이미 존재하는 설정 파일(.eslintrc, eslint.config, prettier 등)이 있을 때의 동작을 선택하세요.\n" +
       "  [s] skip      - 중복 설정 파일은 건너뜀\n" +
       "  [k] keep      - 기존 설정 파일은 그대로 두고, 새로운 설정 파일 생성\n" +
       "  [o] overwrite - (추천) 기존 설정 파일을 덮어씀\n" +
@@ -504,7 +504,7 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error("[eslint-config] 실행 중 오류가 발생했습니다.", error);
+  console.error("[lint-setup-cli] 실행 중 오류가 발생했습니다.", error);
   process.exit(1);
 });
 
