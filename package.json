@@ -1,6 +1,6 @@
 {
   "name": "lint-setup-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "ESLint/Prettier 및 VS Code 설정을 자동 구성하는 설치 헬퍼 CLI",
   "bin": {
     "lint-setup-cli": "bin/index.mjs"
