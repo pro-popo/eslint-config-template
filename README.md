@@ -7,7 +7,6 @@ React / Next.js + TypeScript 환경에서 **ESLint / Prettier / VS Code 설정�
   - `flat-config`: `eslint.config.mjs` (ESLint 9 Flat Config)
   - `eslintrc`: `.eslintrc.json` (Legacy `.eslintrc` 스타일)
 - **프로젝트 타입**
-  - `react`
   - `next`
 - **VS Code**
   - `.vscode/settings.json`
@@ -29,14 +28,22 @@ npx lint-setup-cli --type next --template flat-config
 
 ```bash
 npx lint-setup-cli \
-  --type [react|next] \
+  --type next \
   --template [flat-config|eslintrc] \
+  [--version 14|15|latest] \
   [--on-exists skip|keep|overwrite]
 ```
 
 - **`--type`**
-  - `react`: React 프로젝트용 규칙
   - `next`: Next.js 프로젝트용 규칙 (**기본값**)
+
+- **`--version`**
+  - `14`: Next 14용 eslintrc 템플릿 (`templates/eslintrc/next@14`)
+  - `15`: Next 15용 flat-config 템플릿 (`templates/flat-config/next@15`)
+  - `latest`: 최신 Next용 flat-config 템플릿 (`templates/flat-config/next@latest`)
+  - 생략 시 기본값:
+    - `--template eslintrc` → `14`
+    - `--template flat-config` → `latest`
 
 - **`--template`**
   - `flat-config`: `eslint.config.mjs` (**기본값**)
@@ -63,14 +70,14 @@ npx lint-setup-cli \
 ### 예시
 
 ```bash
-# 1) Flat Config 기반 Next.js
+# 1) eslintrc 기반 Next 14
+npx lint-setup-cli --type next --template eslintrc --version 14
+
+# 2) Flat Config 기반 Next 15
+npx lint-setup-cli --type next --template flat-config --version 15
+
+# 3) Flat Config 기반 Next 최신 (버전 생략 시 latest)
 npx lint-setup-cli --type next --template flat-config
-
-# 2) Flat Config 기반 React
-npx lint-setup-cli --type react --template flat-config
-
-# 3) eslintrc 기반 Next.js
-npx lint-setup-cli --type next --template eslintrc
 ```
 
 <br/>

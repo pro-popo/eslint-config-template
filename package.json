@@ -19,7 +19,7 @@
   ],
   "author": "",
   "license": "MIT",
-    "repository": {
+  "repository": {
     "type": "git",
     "url": "git+https://github.com/pro-popo/lint-setup-cli.git"
   },
@@ -28,5 +28,3 @@
   },
   "homepage": "https://github.com/pro-popo/lint-setup-cli#readme"
 }
-
-

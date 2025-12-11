@@ -16,18 +16,24 @@ function printHelp() {
 lint-setup-cli
 
 사용법:
-  npx lint-setup-cli --type [react|next] --template [flat-config|eslintrc] [--on-exists skip|keep|overwrite]
+  npx lint-setup-cli --type next --template [flat-config|eslintrc] [--version 14|1flat-config5|latest] [--on-exists skip|keep|overwrite]
 
 옵션:
-  --type      설정 종류 (react, next)
+  --type      프로젝트 타입 (next)
   --template  템플릿 스타일 (flat-config = eslint.config.mjs, eslintrc = .eslintrc.json)
+  --version   Next.js 프리셋 버전 (14, 15, latest)
   --on-exists 기존 설정 파일(.eslintrc, eslint.config, prettier 등) 처리 방식
               (skip = 건너뛰기, keep = 기존 유지 및 새파일 생성, overwrite = 덮어쓰기, 기본값: overwrite)
 
 예시:
-  npx lint-setup-cli --type react --template flat-config
+  # Next 14 + eslintrc
+  npx lint-setup-cli --type next --template eslintrc --version 14
+
+  # Next 15 + flat-config
+  npx lint-setup-cli --type next --template flat-config --version 15
+
+  # Next latest + flat-config (버전 생략 시 기본값: latest)
   npx lint-setup-cli --type next --template flat-config
-  npx lint-setup-cli --type next --template eslintrc
 `.trim());
 }
 
@@ -39,6 +45,8 @@ function parseArgs(argv) {
       args.type = argv[++i];
     } else if (arg === "--template") {
       args.template = argv[++i];
+    } else if (arg === "--version") {
+      args.version = argv[++i];
     } else if (arg === "--on-exists") {
       args.onExists = argv[++i];
     } else if (arg === "--help" || arg === "-h") {
@@ -49,34 +57,77 @@ function parseArgs(argv) {
 }
 
 /**
- * 선택된 템플릿(react/next + flat-config/eslintrc)의 파일을
+ * 선택된 템플릿(next + flat-config/eslintrc)의 파일을
  * 현재 작업 디렉터리로 복사합니다.
  *
  * 주의
  * - package.json은 여기서 직접 복사하지 않고, mergePackageJson에서 devDependencies만 병합
  * - onExists 옵션으로 기존 파일이 있을 때의 동작(skip/keep/overwrite)을 제어
  */
-async function copyTemplate({ type, template, onExists }) {
+async function copyTemplate({ type, template, version, onExists }) {
   const normalizedType = type || "next";
   const normalizedTemplate = template || "flat-config";
   const normalizedOnExists = onExists || "overwrite"; 
+  const normalizedVersion =
+    version ||
+    (normalizedTemplate === "eslintrc" ? "14" : "latest");
 
-  const validTypes = ["react", "next"];
+  const validTypes = ["next"];
   const validTemplates = ["flat-config", "eslintrc"];
   const validOnExists = ["skip", "keep", "overwrite"];
+  const validVersions = ["14", "15", "latest"];
 
   if (
     !validTypes.includes(normalizedType) ||
     !validTemplates.includes(normalizedTemplate) ||
-    !validOnExists.includes(normalizedOnExists)
+    !validOnExists.includes(normalizedOnExists) ||
+    !validVersions.includes(normalizedVersion)
   ) {
     console.error("[lint-setup-cli] 잘못된 옵션입니다.\n");
     printHelp();
     process.exit(1);
   }
 
-  const templateStyleDir = normalizedTemplate === "eslintrc" ? "eslintrc" : "flat-config";
-  const templateDir = path.join(__dirname, "..", "templates", templateStyleDir, normalizedType);
+  // 템플릿 스타일별로 지원하는 Next 버전 조합을 제한한다.
+  if (normalizedTemplate === "eslintrc" && normalizedVersion !== "14") {
+    console.error(
+      "[lint-setup-cli] eslintrc 템플릿은 현재 Next 14만 지원합니다. --version 14 를 사용해 주세요."
+    );
+    process.exit(1);
+  }
+
+  if (normalizedTemplate === "flat-config" && normalizedVersion === "14") {
+    console.error(
+      "[lint-setup-cli] flat-config 템플릿은 Next 15 이상만 지원합니다. --version 15 또는 latest 를 사용해 주세요."
+    );
+    process.exit(1);
+  }
+
+  const templateStyleDir =
+    normalizedTemplate === "eslintrc" ? "eslintrc" : "flat-config";
+
+  // 타입/버전에 따라 실제 템플릿 디렉터리명을 결정한다.
+  // - eslintrc: templates/eslintrc/next@14
+  // - flat-config: templates/flat-config/next@15 또는 templates/flat-config/next@latest
+  let typeDir = normalizedType;
+  if (normalizedType === "next") {
+    if (templateStyleDir === "eslintrc") {
+      typeDir = `next@${normalizedVersion}`; // 현재는 next@14 만 존재
+    } else {
+      typeDir =
+        normalizedVersion === "latest"
+          ? "next@latest"
+          : `next@${normalizedVersion}`; // next@15
+    }
+  }
+
+  const templateDir = path.join(
+    __dirname,
+    "..",
+    "templates",
+    templateStyleDir,
+    typeDir
+  );
 
   if (!fs.existsSync(templateDir)) {
     console.error(
@@ -130,8 +181,8 @@ async function copyTemplate({ type, template, onExists }) {
   }
 
   // 실행 순서: ESLint -> Prettier -> package.json -> VS Code
-  await buildEslintConfig(templateStyleDir, normalizedType, normalizedOnExists);
-  buildPrettierConfig(templateStyleDir, normalizedType, normalizedOnExists);
+  await buildEslintConfig(templateStyleDir, typeDir, normalizedOnExists);
+  buildPrettierConfig(templateStyleDir, typeDir, normalizedOnExists);
   mergePackageJson(templateDir);
   ensureVscodeSettings();
   ensureVscodeExtensions();
@@ -374,7 +425,7 @@ function ensureVscodeExtensions() {
   }
 }
 
-function buildPrettierConfig(templateStyleDir, type, onExists) {
+function buildPrettierConfig(templateStyleDir, typeDir, onExists) {
   try {
     // eslintrc 템플릿에서는 .prettierrc 파일을 그대로 복사하므로
     // 별도의 빌드 과정이 필요하지 않다.
@@ -389,7 +440,7 @@ function buildPrettierConfig(templateStyleDir, type, onExists) {
       "..",
       "templates",
       templateStyleDir,
-      type,
+      typeDir,
       templatePrettierName
     );
 
@@ -436,7 +487,7 @@ function buildPrettierConfig(templateStyleDir, type, onExists) {
   }
 }
 
-async function buildEslintConfig(templateStyleDir, type, onExists) {
+async function buildEslintConfig(templateStyleDir, typeDir, onExists) {
   try {
     // 현재는 flat-config / eslintrc 모두 템플릿 파일을 그대로 복사하는 방식으로 동작하므로
     // 별도의 ESLint 설정 빌드 로직은 사용하지 않는다.
@@ -499,6 +550,7 @@ async function main() {
   copyTemplate({
     type: args.type,
     template: args.template,
+    version: args.version,
     onExists
   });
 }

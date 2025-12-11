@@ -18,7 +18,6 @@ const eslintConfig = [
   ...compat.extends(
     "plugin:import/recommended",
     "plugin:import/typescript",
-    "plugin:@typescript-eslint/recommended",
     "next/core-web-vitals",
     "next/typescript"
   ),
